@@ -8,6 +8,8 @@ bl_info = {
     "description": "Generates NSMB2 route and point files to simplify creating custom maps",
 }
 
+
+
 import bpy
 import csv
 import numpy
@@ -131,6 +133,7 @@ class mainpanel(bpy.types.Panel):
     bl_region_type = "UI"
     bl_category = "Item"
     
+    
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -149,18 +152,23 @@ class  writefiles(bpy.types.Operator):
 
         
     def execute(self,context):
+
+
             
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
+        
         if(mytool.path[1:2] == ":"):
             writeRoute(mytool.path)
             writeNode(mytool.path)
+            self.report({"INFO"},"Saved point.csv and route.csv in " + mytool.path)
             return {"FINISHED"}
         elif(mytool.path == ""):
+            self.report({"ERROR"},"No output directory found")
             return {"FINISHED"}
         else:
-            mytool.path = "Hover over box!"
+            self.report({"ERROR"},"Invalid path, set a valid directory and make sure it's an absolute path.")
             return {"FINISHED"}
         
 
