@@ -1,22 +1,13 @@
 bl_info = {
-    "name": "RouteExport",
+    "name": "Map Export",
     "blender": (3, 00, 0),
     "category": "Object",
-    "author": "Huseyin the Mighty",
-    "version": (0, 1),
-    "location": "View3D > Add > Mesh > New Object",
-    "description": "Generates NSMB2 route and point files to simplify creating custom maps",
 }
-
-
 
 import bpy
 import csv
 import numpy
 import os
-
-action = '走る' 
-sound = '"道"'
 
 #gets child objects
 def hierachy(obj, levels):
@@ -34,6 +25,7 @@ def arr(name, level):
     h = hierachy(bpy.data.objects[name],level)
     return h
 
+
 def fnodearr():
     x = arr('course',1)
     del x[0]
@@ -44,9 +36,10 @@ def fnodearr():
            x += [h[i]]
     return x
 
-#Level node and F node generation
 
-def generateNode():
+
+#Level node and F node generation
+def generateNode(event):
     nodearr = arr('course',1)
     del nodearr[0]
     node = []
@@ -54,114 +47,208 @@ def generateNode():
         node.insert(x, [f'{x}',nodearr[x],'','','','','','',''])
     for x in range(0,len(fnodearr())):
         if(fnodearr()[x][0:1] == 'F'):
-            node.insert(x, [f'{x}',fnodearr()[x],'stop','','','','','',''])
+            node.insert(x, [f'{x}',fnodearr()[x],event,'','','','','',''])
     return node
 
 
-#Route generation
-def generateRoute():
+def getRoute():
     routearr = arr('route',20)
     routes = []
+    routes2 = []
     del routearr[0]
     for y in routearr:
         routes += [hierachy(bpy.data.objects[y],20)]
-        
+    for x in routes:
+        if(x[0][0:1]=='R'):
+            routes2 += [x]
+    return routes2
+
+
+#Route generation
+def generateRoute(routeentry, sounds, movement):
     route = []
     for x in fnodearr():
         for y in fnodearr():
-            for i, obj in enumerate(routes):
-                if ((obj[0] == 'R' + x + y) and (obj[0][0:1] == 'R' and len(obj) == 1)):
-                    route.append([f'{obj[0]}',action,sound])
-                elif((obj[0] == 'R' + x + y) and (obj[0][0:1] == 'R') and len(obj) > 1):
-                    l = 0
-                    for a in range(0,len(obj)):
-                        l+=1
-                    for c in range(0,l):
-                        if(c==0 and len(obj)-1 < 2):
-                            if( obj[0][5:6] == 'F' and  obj[1][0:1] == 'F'):
-                                route.append([f'{obj[0]}',action,sound])
-                                break
-                            elif(obj[0][5:6] == 'F' and  obj[1][0:1] == 'K'):
-                                route.append([f'R{obj[0][1:5] + obj[1]}',action,sound])
-                                route.append([f'R{obj[1] + obj[0][5:9]}',action,sound])
-                                break
-                            else:
-                                route.append([f'R{obj[0][1:5] + obj[1]}',action,sound])
-                                route.append([f'R{obj[1] + obj[0][5:9]}',action,sound])
-                                break
-                        elif(c==0 and len(obj)-1 > 1):
-                            
-                            route.append([f'R{obj[0][1:5] + obj[c+1]}',action,sound])
-                        elif(c==len(obj)-1):
-                            if(obj[c][0:1] == 'F'):
-                                break
-                            else:
-                                route.append([f'R{obj[c] + obj[0][5:9]}',action,sound])
-                        elif(c > 0 and c < len(obj)-1):
-                            route.append([f'R{obj[c] + obj[c+1]}',action,sound])
+            if ((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R' and len(routeentry) == 1)):
+                route.append([f'{routeentry[0]}',sounds,movement])
+            elif((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R') and len(routeentry) > 1):
+                l = 0
+                for a in range(0,len(routeentry)):
+                    l+=1
+                for c in range(0,l):
+                    if(c==0 and len(routeentry)-1 < 2):
+                        if( routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'F'):
+                            route.append([f'{routeentry[0]}',sounds,movement])
+                            break
+                        elif(routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'K'):
+                            route.append([f'R{routeentry[0][1:5] + routeentry[1]}',sounds,movement])
+                            route.append([f'R{routeentry[1] + routeentry[0][5:9]}',sounds,movement])
+                            break
+                        else:
+                            route.append([f'R{routeentry[0][1:5] + routeentry[1]}',sounds,movement])
+                            route.append([f'R{routeentry[1] + routeentry[0][5:9]}',sounds,movement])
+                            break
+                    elif(c==0 and len(routeentry)-1 > 1):
+                        
+                        route.append([f'R{routeentry[0][1:5] + routeentry[c+1]}',sounds,movement])
+                    elif(c==len(routeentry)-1):
+                        if(routeentry[c][0:1] == 'F'):
+                            break
+                        else:
+                            route.append([f'R{routeentry[c] + routeentry[0][5:9]}',sounds,movement])
+                    elif(c > 0 and c < len(routeentry)-1):
+                        route.append([f'R{routeentry[c] + routeentry[c+1]}',sounds,movement])
     return route
 
-def writeNode(h):
-    with open(h + '\\point.csv', 'w',encoding='shift_jis', newline='') as file:
+
+def routeGeneration():
+    h = []
+    for x in getRoute():
+        h += generateRoute(x,movementdict[bpy.data.objects[x[0]]["Movement"][0]][0], sounddict[bpy.data.objects[x[0]]["Sound"][0]][0])
+    return h
+  
+
+def writeNode(dir):
+    with open(dir + '\\point.csv', 'w',encoding='shift_jis', newline='') as file:
         mywriter = csv.writer(file, delimiter=',')
-        mywriter.writerows(numpy.array(generateNode()))
+        mywriter.writerows(numpy.array(generateNode('stop')))
     
-def writeRoute(h):
-    with open(h + '\\route.csv', 'w',encoding='shift_jis', newline='') as file:
+def writeRoute(dir, routearray):
+    with open(dir + '\\route.csv', 'w',encoding='shift_jis', newline='') as file:
         mywriter = csv.writer(file, delimiter=',',quotechar='',escapechar='\\', quoting=csv.QUOTE_NONE)
-        mywriter.writerows(numpy.array(generateRoute()))
+        mywriter.writerows(routearray)
+        
+        
+        
+        
+sounddict = {
+    1 : ('"道"','Road'),
+    2 : ('"雪"','Snow'),
+    3 : ('"砂"','Sand'),
+    4 : ('"氷"','Ice - Unused'),
+    5 : ('"草"','Grass'),
+    6 : ('"水"','Water'),
+    7 : ('"雲"','Cloud'),
+    8 : ('"砂間欠泉"','Sand Geyser - Unused'),
+    9 : ('"マンタ"','Mushroom'),
+    10 : ('"ビーチ"','Beach - Unused'),
+    11 : ('"じゅうたん"','Carpet'),
+    12 : ('"葉っぱ"','Leaf - Unused'),
+    13 : ('"樽"','Barrel'),
+    14 : ('"水間欠泉"','Water Geyser - Unused'),
+}
+    
+
+movementdict = {
+    1 : ('走る','Walk'),
+    2 : ('ジャンプ','Jump'),
+}
+    
+pathtypedict = {
+    1 : "Normal",
+    2 : "Secret Exit",
+    3 : "Both",
+}
+
 
 
 
 class properties(bpy.types.PropertyGroup):
+
+    secretexit : bpy.props.BoolProperty(name = "Secret Exit")
+    
+    fevent : bpy.props.StringProperty(name = "Event")
         
     path : bpy.props.StringProperty(
         name="",
-        description="Output for point and route files. Select an ABSOLUTE path.",
+        description="Path to Directory",
         default="",
         maxlen=1024,
         subtype='DIR_PATH')
-        
-    def show(self):
-        print(path) 
-        
-        
+
 class mainpanel(bpy.types.Panel):
     bl_label = "RouteExport"
     bl_idname = "ADDONNAME_PT_main_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "Item"
-    
+    bl_category = "RouteExp"
     
     def draw(self, context):
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
-        row = layout.row()
         col = layout.column(align=True)
-        
-        row.operator("addonname.myop_operator")
+        obj = context.object
+            
 
-        layout.prop(scene.my_tool,"path", text="Output")
+        layout.prop(obj, "name")
+        layout.prop(scene.my_tool, "path", text="Output")
+        row = layout.row()
+        row.operator("routeexport.writefiles")
+        row = layout.row()
+        row.operator("routeexport.generateprop")
         
+        if(obj.name[0:1]=='W'):
+            layout.label(text="Level")
+            layout.prop(mytool, "secretexit")
+        if(obj.name[0:2]=='F0'):
+            layout.label(text="F-Node")
+            layout.prop(obj, '["Event"]')
+        if(obj.name[0:1]=='R'):
+            layout.label(text="Route: " + obj.name)
+            
+            layout.prop(obj, '["Movement"]')
+            layout.label(text=movementdict[obj['Movement'][0]][1])
+            layout.prop(obj, '["Sound"]')  
+            layout.label(text=sounddict[obj['Sound'][0]][1])
+            layout.prop(obj, '["Path Unlock Type"]')
+            layout.label(text=pathtypedict[obj['Path Unlock Type'][0]])
+            
         
-class  writefiles(bpy.types.Operator):
-    bl_label = "Export Route Files"
-    bl_idname = "addonname.myop_operator"
+        if(obj.name[0:1]=='K'):
+            layout.label(text="K Node")
+        
 
+class generateprop(bpy.types.Operator):
+    bl_label = "Generate Properties / Reset Properties"
+    bl_idname = "routeexport.generateprop"
         
     def execute(self,context):
+        layout = self.layout
+        scene = context.scene
+        mytool = scene.my_tool
+        obj = context.object
+         
 
 
+        routes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["R"]]
+        for obj in routes:
+            obj["Movement"] = [1]
+            obj["Sound"] = [1]
+            obj["Path Unlock Type"] = [1]
             
+        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["F"]]
+
+        for obj in fnodes:
+            obj["Event"] = 'stop'
+        
+        return {"FINISHED"}
+    
+class writefiles(bpy.types.Operator):
+    bl_label = "Export Route Files"
+    bl_idname = "routeexport.writefiles"
+
+        
+    def execute(self,context):    
         layout = self.layout
         scene = context.scene
         mytool = scene.my_tool
         
+        
         if(mytool.path[1:2] == ":"):
-            writeRoute(mytool.path)
+            
             writeNode(mytool.path)
+            writeRoute(mytool.path, routeGeneration())
             self.report({"INFO"},"Saved point.csv and route.csv in " + mytool.path)
             return {"FINISHED"}
         elif(mytool.path == ""):
@@ -170,10 +257,14 @@ class  writefiles(bpy.types.Operator):
         else:
             self.report({"ERROR"},"Invalid path, set a valid directory and make sure it's an absolute path.")
             return {"FINISHED"}
-        
+    
+
 
     
-classes = [properties,mainpanel,writefiles]
+    
+    
+classes = [properties,mainpanel,generateprop,writefiles]
+    
     
 def register():
     for cls in classes:
@@ -189,3 +280,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
