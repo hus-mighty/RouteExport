@@ -1,7 +1,11 @@
 bl_info = {
-    "name": "Map Export",
+    "name": "RouteExport",
     "blender": (3, 00, 0),
     "category": "Object",
+    "author": "Huseyin the Mighty",
+    "version": (0, 1),
+    "location": "View3D > Add > Mesh > New Object",
+    "description": "Generates NSMB2 route and point files to simplify creating custom maps",
 }
 
 import bpy
