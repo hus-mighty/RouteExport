@@ -1,11 +1,7 @@
 bl_info = {
-    "name": "RouteExport",
+    "name": "Map Export",
     "blender": (3, 00, 0),
     "category": "Object",
-    "author": "Huseyin the Mighty",
-    "version": (0, 1),
-    "location": "View3D > Add > Mesh > New Object",
-    "description": "Generates NSMB2 route and point files to simplify creating custom maps",
 }
 
 import bpy
@@ -195,20 +191,63 @@ class mainpanel(bpy.types.Panel):
         if(obj.name[0:1]=='W'):
             layout.label(text="Level")
             layout.prop(mytool, "secretexit")
+            
+            
         if(obj.name[0:2]=='F0'):
             layout.label(text="F-Node")
             layout.prop(obj, '["Event"]')
+            
+ 
         if(obj.name[0:1]=='R'):
             layout.label(text="Route: " + obj.name)
             
+              
+            layout.prop(obj, '["Sound"]')
+            if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
+                layout.label(text=sounddict[obj['Sound'][0]][1])
+                
+            elif(obj['Sound'][0] < 1):
+                obj['Sound'][0] = 1
+                layout.label(text=sounddict[1][1])
+                
+            elif(obj['Sound'][0] > len(sounddict)):
+                obj['Sound'][0] = len(sounddict)
+                layout.label(text=sounddict[len(sounddict)][1])
+                            
+ 
             layout.prop(obj, '["Movement"]')
-            layout.label(text=movementdict[obj['Movement'][0]][1])
-            layout.prop(obj, '["Sound"]')  
-            layout.label(text=sounddict[obj['Sound'][0]][1])
-            layout.prop(obj, '["Path Unlock Type"]')
-            layout.label(text=pathtypedict[obj['Path Unlock Type'][0]])
+            if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
+                layout.label(text=movementdict[obj['Movement'][0]][1])
+                
+            elif(obj['Movement'][0] < 1):
+                obj['Movement'][0] = 1
+                layout.label(text=movementdict[1][1])
+                
+            elif(obj['Movement'][0] > len(movementdict)):
+                obj['Movement'][0] = len(movementdict)
+                layout.label(text=movementdict[len(movementdict)][1])
             
-        
+            
+            layout.prop(obj, '["Path Unlock Type"]')
+            if(obj['Path Unlock Type'][0] > 0 and obj['Path Unlock Type'][0] < len(pathtypedict)+1):
+                layout.label(text=pathtypedict[obj['Path Unlock Type'][0]])
+                
+            elif(obj['Path Unlock Type'][0] < 1):
+                obj['Path Unlock Type'][0] = 1
+                layout.label(text=pathtypedict[1])
+                
+            elif(obj['Path Unlock Type'][0] > len(pathtypedict)):
+                obj['Path Unlock Type'][0] = len(pathtypedict)
+                layout.label(text=pathtypedict[len(pathtypedict)])
+                
+                
+
+            
+
+                
+
+
+                
         if(obj.name[0:1]=='K'):
             layout.label(text="K Node")
         
