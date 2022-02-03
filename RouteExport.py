@@ -44,7 +44,10 @@ def generateNode(event):
     del nodearr[0]
     node = []
     for x in range(0,len(nodearr)):
-        node.insert(x, [f'{x}',nodearr[x],'','','','','','',''])
+        for i in levelTuples():
+            if(i[0]== nodearr[x]):
+                node.insert(x, [f'{x}',nodearr[x],'R{i[0] + i[1]}','','','','','',''])
+        
     for x in range(0,len(fnodearr())):
         if(fnodearr()[x][0:1] == 'F'):
             node.insert(x, [f'{x}',fnodearr()[x],event,'','','','','',''])
@@ -101,11 +104,50 @@ def generateRoute(routeentry, sounds, movement):
     return route
 
 
+def generateRouteList(routeentry):
+    route = []
+    for x in fnodearr():
+        for y in fnodearr():
+            if ((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R' and len(routeentry) == 1)):
+                route.append((f'{routeentry[0][1:5]}', routeentry[0][5:9]))
+            elif((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R') and len(routeentry) > 1):
+                l = 0
+                for a in range(0,len(routeentry)):
+                    l+=1
+                for c in range(0,l):
+                    if(c==0 and len(routeentry)-1 < 2):
+                        if( routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'F'):
+                            route.append((f'{routeentry[0][1:5]}', routeentry[0][5:9]))
+                            break
+                        elif(routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'K'):
+                            route.append((f'{routeentry[0][1:5]}', routeentry[1]))
+                            route.append((f'{routeentry[1]}', routeentry[0][5:9]))
+                            break
+                        else:
+                            route.append((f'{routeentry[0][1:5]}', routeentry[1]))
+                            route.append((f'{routeentry[1]}', routeentry[0][5:9]))
+                            break
+                    elif(c==0 and len(routeentry)-1 > 1):
+                            
+                        route.append((f'{routeentry[0][1:5]}', routeentry[c+1]))
+                    elif(c==len(routeentry)-1):
+                        if(routeentry[c][0:1] == 'F'):
+                            break
+                        else:
+                            route.append((f'{routeentry[c]}', routeentry[0][5:9]))
+                    elif(c > 0 and c < len(routeentry)-1):
+                        route.append((f'{routeentry[c]}', routeentry[c+1]))
+    return route
+
+
 def routeGeneration():
     h = []
     for x in getRoute():
         h += generateRoute(x,movementdict[bpy.data.objects[x[0]]["Movement"][0]][0], sounddict[bpy.data.objects[x[0]]["Sound"][0]][0])
     return h
+
+
+
   
 
 def writeNode(dir):
@@ -118,8 +160,18 @@ def writeRoute(dir, routearray):
         mywriter = csv.writer(file, delimiter=',',quotechar='',escapechar='\\', quoting=csv.QUOTE_NONE)
         mywriter.writerows(routearray)
         
-        
-        
+def routeListGeneration():
+    h = []
+    for x in getRoute():
+        h += generateRouteList(x)
+    return h
+
+def levelTuples():
+    h = []
+    for x in getRoute():
+        h.append((x[0][1:5], x[0][5:9]))
+    print(h)
+    return h        
         
 sounddict = {
     1 : ('"道"','Road'),
@@ -155,8 +207,6 @@ pathtypedict = {
 
 class properties(bpy.types.PropertyGroup):
 
-    secretexit : bpy.props.BoolProperty(name = "Secret Exit")
-    
     fevent : bpy.props.StringProperty(name = "Event")
         
     path : bpy.props.StringProperty(
@@ -189,19 +239,51 @@ class mainpanel(bpy.types.Panel):
         row.operator("routeexport.generateprop")
         
         if(obj.name[0:1]=='W'):
-            layout.label(text="Level")
-            layout.prop(mytool, "secretexit")
+            layout.label(text="Level: " + obj.name)
             
             
-        if(obj.name[0:2]=='F0'):
-            layout.label(text="F-Node")
-            layout.prop(obj, '["Event"]')
+        if(obj.name[0:2]=='F0'):        
+
+            layout.prop(obj, '["Sound"]')
+            if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
+                layout.label(text=sounddict[obj['Sound'][0]][1])
+                
+            elif(obj['Sound'][0] < 1):
+                obj['Sound'][0] = 1
+                layout.label(text=sounddict[1][1])
+                
+            elif(obj['Sound'][0] > len(sounddict)):
+                obj['Sound'][0] = len(sounddict)
+                layout.label(text=sounddict[len(sounddict)][1])
+                            
+ 
+            layout.prop(obj, '["Movement"]')
+            if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
+                layout.label(text=movementdict[obj['Movement'][0]][1])
+                
+            elif(obj['Movement'][0] < 1):
+                obj['Movement'][0] = 1
+                layout.label(text=movementdict[1][1])
+                
+            elif(obj['Movement'][0] > len(movementdict)):
+                obj['Movement'][0] = len(movementdict)
+                layout.label(text=movementdict[len(movementdict)][1])
+            
+            
+
+            
             
  
         if(obj.name[0:1]=='R'):
-            layout.label(text="Route: " + obj.name)
-            
-              
+                 
+            for x in routeListGeneration():
+                if((x[0]) == obj.name[1:5]):
+                    layout.label(text='Route: ' + obj.name[0:5] + x[1])
+
+                    
+                    
+        
+
             layout.prop(obj, '["Sound"]')
             if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
                 layout.label(text=sounddict[obj['Sound'][0]][1])
@@ -241,15 +323,45 @@ class mainpanel(bpy.types.Panel):
                 layout.label(text=pathtypedict[len(pathtypedict)])
                 
                 
-
-            
-
                 
-
-
+                
+                
                 
         if(obj.name[0:1]=='K'):
-            layout.label(text="K Node")
+
+
+                 
+            for x in routeListGeneration():
+                if((x[0]) == obj.name[0:4]):
+                    layout.label(text='Route: R' + obj.name + x[1])
+
+        
+
+            layout.prop(obj, '["Sound"]')
+            if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
+                layout.label(text=sounddict[obj['Sound'][0]][1])
+                
+            elif(obj['Sound'][0] < 1):
+                obj['Sound'][0] = 1
+                layout.label(text=sounddict[1][1])
+                
+            elif(obj['Sound'][0] > len(sounddict)):
+                obj['Sound'][0] = len(sounddict)
+                layout.label(text=sounddict[len(sounddict)][1])
+                            
+ 
+            layout.prop(obj, '["Movement"]')
+            if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
+                layout.label(text=movementdict[obj['Movement'][0]][1])
+                
+            elif(obj['Movement'][0] < 1):
+                obj['Movement'][0] = 1
+                layout.label(text=movementdict[1][1])
+                
+            elif(obj['Movement'][0] > len(movementdict)):
+                obj['Movement'][0] = len(movementdict)
+                layout.label(text=movementdict[len(movementdict)][1])
+            
         
 
 class generateprop(bpy.types.Operator):
@@ -274,6 +386,14 @@ class generateprop(bpy.types.Operator):
 
         for obj in fnodes:
             obj["Event"] = 'stop'
+            obj["Movement"] = [1]
+            obj["Sound"] = [1]
+            
+        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["K"]]
+
+        for obj in fnodes:
+            obj["Movement"] = [1]
+            obj["Sound"] = [1]
         
         return {"FINISHED"}
     
@@ -302,9 +422,6 @@ class writefiles(bpy.types.Operator):
             return {"FINISHED"}
     
 
-
-    
-    
     
 classes = [properties,mainpanel,generateprop,writefiles]
     
@@ -323,4 +440,3 @@ def unregister():
 
 if __name__ == "__main__":
     register()
-
