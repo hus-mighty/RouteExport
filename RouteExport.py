@@ -46,7 +46,7 @@ def generateNode(event):
     for x in range(0,len(nodearr)):
         for i in levelTuples():
             if(i[0]== nodearr[x]):
-                node.insert(x, [f'{x}',nodearr[x],'R{i[0] + i[1]}','','','','','',''])
+                node.insert(x, [f'{x}',nodearr[x],'R'+ i[0] + i[1],'','','','','',''])
         
     for x in range(0,len(fnodearr())):
         if(fnodearr()[x][0:1] == 'F'):
@@ -151,7 +151,6 @@ sounddict = {
     13 : ('"樽"','Barrel'),
     14 : ('"水間欠泉"','Water Geyser - Unused'),
 }
-    
 
 movementdict = {
     1 : ('走る','Walk'),
@@ -180,7 +179,7 @@ class properties(bpy.types.PropertyGroup):
 
 class mainpanel(bpy.types.Panel):
     bl_label = "RouteExport"
-    bl_idname = "mainpanel"
+    bl_idname = "ADDONNAME_PT_main_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "RouteExp"
@@ -204,7 +203,16 @@ class mainpanel(bpy.types.Panel):
             layout.label(text="Level: " + obj.name)
             
             
-        if(obj.name[0:2]=='F0'):        
+        if(obj.name[0:2]=='F0'):
+            
+            for x in routeTuples():
+                
+                if((x[0]) == obj.name[0:4]):
+                    layout.label(text='Route: ' + obj.name[0:5] + x[1])
+                elif(not obj.children):
+                    layout.label(text='Route: none')
+                    break
+ 
 
             layout.prop(obj, '["Sound"]')
             if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
@@ -236,8 +244,15 @@ class mainpanel(bpy.types.Panel):
         if(obj.name[0:1]=='R'):
                  
             for x in routeTuples():
-                if((x[0]) == obj.name[1:5]):
-                    layout.label(text='Route: ' + obj.name[0:5] + x[1])
+                if(obj.children):
+                    if((x[0]) == obj.name[1:5] and obj.children[0].name == x[1]):
+                        layout.label(text='Route: ' + obj.name[0:5] + x[1])
+                else:
+                    layout.label(text='Route: ' + obj.name)
+                    break
+
+
+
 
 
             layout.prop(obj, '["Sound"]')
