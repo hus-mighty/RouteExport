@@ -9,6 +9,13 @@ import csv
 import numpy
 import os
 
+def getKNodeParent(obj):
+    if(obj.parent and not obj.name[0:1] == 'R'):
+        obj = obj.parent
+        return getKNodeParent(obj)
+    else:
+        return obj
+
 #gets child objects
 def hierachy(obj, levels):
     knode = []
@@ -121,13 +128,6 @@ def routeGeneration():
         h += generateRoute(x,movementdict[bpy.data.objects[x[0]]["Movement"][0]][0], sounddict[bpy.data.objects[x[0]]["Sound"][0]][0])
     return h
 
-        
-def routeTuples():
-    t = []
-    for y in routeGeneration():
-        t.append((y[0][1:5], y[0][5:9]))
-    return t
-
 
 def levelTuples():
     h = []
@@ -198,19 +198,17 @@ class mainpanel(bpy.types.Panel):
         row = layout.row()
         row.operator("routeexport.generateprop")
         
-        if(obj.name[0:1]=='W'):
+        if(obj.name[0:1]=='W' and obj.parent.name == 'course'):
             layout.label(text="Level: " + obj.name)
             
         #F-Node
-        if(obj.name[0:2]=='F0'):
+        if(obj.name[0:2]=='F0' and getKNodeParent(obj).name[0:1] == 'R'):
             
             #Route Label
-            for x in routeTuples():
-                if((x[0]) == obj.name[0:4]):
-                    layout.label(text='Route: ' + obj.name[0:5] + x[1])
-                elif(not obj.children):
-                    layout.label(text='Route: none')
-                    break
+            if(obj.children):
+                layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
+            else:
+                layout.label(text='Route: None')
  
             #sound slider and label
             layout.prop(obj, '["Sound"]')
@@ -240,16 +238,14 @@ class mainpanel(bpy.types.Panel):
             
                 
         #route
-        if(obj.name[0:1]=='R'):
+        if(obj.name[0:1]=='R' and obj.parent.name == 'route'):
             
             #Route Label
-            for x in routeTuples():
-                if(obj.children):
-                    if((x[0]) == obj.name[1:5] and obj.children[0].name == x[1]):
-                        layout.label(text='Route: ' + obj.name[0:5] + x[1])
-                else:
-                    layout.label(text='Route: ' + obj.name)
-                    break
+            if(obj.children):
+                layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
+            else:
+                layout.label(text='Route: ' + obj.name)
+                
                 
             #sound slider and label
             layout.prop(obj, '["Sound"]')
@@ -292,12 +288,13 @@ class mainpanel(bpy.types.Panel):
                 
                 
                 
-        if(obj.name[0:1]=='K'):
+        if(obj.name[0:1]=='K' and getKNodeParent(obj).name[0:1] == 'R'):
             
             #Route Label
-            for x in routeTuples():
-                if((x[0]) == obj.name[0:4]):
-                    layout.label(text='Route: R' + obj.name + x[1])
+            if(obj.children):
+                layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
+            else:
+                layout.label(text='Route: R' + obj.name + getKNodeParent(obj).name[5:9])
 
         
             #sound slider and label
@@ -404,3 +401,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+
