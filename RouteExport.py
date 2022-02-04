@@ -207,35 +207,35 @@ class mainpanel(bpy.types.Panel):
             #Route Label
             if(obj.children):
                 layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
-            else:
-                layout.label(text='Route: None')
+
  
-            #sound slider and label
-            layout.prop(obj, '["Sound"]')
-            if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
-                layout.label(text=sounddict[obj['Sound'][0]][1])
-                
-            elif(obj['Sound'][0] < 1):
-                obj['Sound'][0] = 1
-                layout.label(text=sounddict[1][1])
-                
-            elif(obj['Sound'][0] > len(sounddict)):
-                obj['Sound'][0] = len(sounddict)
-                layout.label(text=sounddict[len(sounddict)][1])
-                            
-            #movement slider and label
-            layout.prop(obj, '["Movement"]')
-            if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
-                layout.label(text=movementdict[obj['Movement'][0]][1])
-                
-            elif(obj['Movement'][0] < 1):
-                obj['Movement'][0] = 1
-                layout.label(text=movementdict[1][1])
-                
-            elif(obj['Movement'][0] > len(movementdict)):
-                obj['Movement'][0] = len(movementdict)
-                layout.label(text=movementdict[len(movementdict)][1])
-            
+                #sound slider and label
+                layout.prop(obj, '["Sound"]')
+                if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
+                    layout.label(text=sounddict[obj['Sound'][0]][1])
+                    
+                elif(obj['Sound'][0] < 1):
+                    obj['Sound'][0] = 1
+                    layout.label(text=sounddict[1][1])
+                    
+                elif(obj['Sound'][0] > len(sounddict)):
+                    obj['Sound'][0] = len(sounddict)
+                    layout.label(text=sounddict[len(sounddict)][1])
+                                
+                #movement slider and label
+                layout.prop(obj, '["Movement"]')
+                if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
+                    layout.label(text=movementdict[obj['Movement'][0]][1])
+                    
+                elif(obj['Movement'][0] < 1):
+                    obj['Movement'][0] = 1
+                    layout.label(text=movementdict[1][1])
+                    
+                elif(obj['Movement'][0] > len(movementdict)):
+                    obj['Movement'][0] = len(movementdict)
+                    layout.label(text=movementdict[len(movementdict)][1])
+            else:
+                layout.label(text='Route: End')
                 
         #route
         if(obj.name[0:1]=='R' and obj.parent.name == 'route'):
