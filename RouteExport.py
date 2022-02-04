@@ -37,7 +37,6 @@ def fnodearr():
     return x
 
 
-
 #Level node and F node generation
 def generateNode(event):
     nodearr = arr('course',1)
@@ -46,11 +45,11 @@ def generateNode(event):
     for x in range(0,len(nodearr)):
         for i in levelTuples():
             if(i[0]== nodearr[x]):
-                node.insert(x, [f'{x}',nodearr[x],'R'+ i[0] + i[1],'','','','','',''])
+                node.insert(x, (f'{x}',nodearr[x],'R'+ i[0] + i[1],'','','','','','R'+ i[0] + i[1]))
         
     for x in range(0,len(fnodearr())):
         if(fnodearr()[x][0:1] == 'F'):
-            node.insert(x, [f'{x}',fnodearr()[x],event,'','','','','',''])
+            node.insert(x, (f'{x}',fnodearr()[x],event,'','','','','',''))
     return node
 
 
@@ -109,6 +108,7 @@ def writeNode(dir):
         mywriter = csv.writer(file, delimiter=',')
         mywriter.writerows(numpy.array(generateNode('stop')))
     
+    
 def writeRoute(dir, routearray):
     with open(dir + '\\route.csv', 'w',encoding='shift_jis', newline='') as file:
         mywriter = csv.writer(file, delimiter=',',quotechar='',escapechar='\\', quoting=csv.QUOTE_NONE)
@@ -134,6 +134,7 @@ def levelTuples():
     for x in getRoute():
         h.append((x[0][1:5], x[0][5:9]))
     return h        
+        
         
 sounddict = {
     1 : ('"道"','Road'),
@@ -164,11 +165,7 @@ pathtypedict = {
 }
 
 
-
-
 class properties(bpy.types.PropertyGroup):
-
-    fevent : bpy.props.StringProperty(name = "Event")
         
     path : bpy.props.StringProperty(
         name="",
@@ -176,6 +173,7 @@ class properties(bpy.types.PropertyGroup):
         default="",
         maxlen=1024,
         subtype='DIR_PATH')
+
 
 class mainpanel(bpy.types.Panel):
     bl_label = "RouteExport"
@@ -191,7 +189,8 @@ class mainpanel(bpy.types.Panel):
         col = layout.column(align=True)
         obj = context.object
             
-
+        
+        #Name, Output, Export and Generate
         layout.prop(obj, "name")
         layout.prop(scene.my_tool, "path", text="Output")
         row = layout.row()
@@ -202,18 +201,18 @@ class mainpanel(bpy.types.Panel):
         if(obj.name[0:1]=='W'):
             layout.label(text="Level: " + obj.name)
             
-            
+        #F-Node
         if(obj.name[0:2]=='F0'):
             
+            #Route Label
             for x in routeTuples():
-                
                 if((x[0]) == obj.name[0:4]):
                     layout.label(text='Route: ' + obj.name[0:5] + x[1])
                 elif(not obj.children):
                     layout.label(text='Route: none')
                     break
  
-
+            #sound slider and label
             layout.prop(obj, '["Sound"]')
             if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
                 layout.label(text=sounddict[obj['Sound'][0]][1])
@@ -226,7 +225,7 @@ class mainpanel(bpy.types.Panel):
                 obj['Sound'][0] = len(sounddict)
                 layout.label(text=sounddict[len(sounddict)][1])
                             
- 
+            #movement slider and label
             layout.prop(obj, '["Movement"]')
             if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
                 layout.label(text=movementdict[obj['Movement'][0]][1])
@@ -240,9 +239,10 @@ class mainpanel(bpy.types.Panel):
                 layout.label(text=movementdict[len(movementdict)][1])
             
                 
- 
+        #route
         if(obj.name[0:1]=='R'):
-                 
+            
+            #Route Label
             for x in routeTuples():
                 if(obj.children):
                     if((x[0]) == obj.name[1:5] and obj.children[0].name == x[1]):
@@ -250,11 +250,8 @@ class mainpanel(bpy.types.Panel):
                 else:
                     layout.label(text='Route: ' + obj.name)
                     break
-
-
-
-
-
+                
+            #sound slider and label
             layout.prop(obj, '["Sound"]')
             if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
                 layout.label(text=sounddict[obj['Sound'][0]][1])
@@ -267,7 +264,7 @@ class mainpanel(bpy.types.Panel):
                 obj['Sound'][0] = len(sounddict)
                 layout.label(text=sounddict[len(sounddict)][1])
                             
- 
+            #movement slider and label
             layout.prop(obj, '["Movement"]')
             if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
                 layout.label(text=movementdict[obj['Movement'][0]][1])
@@ -280,7 +277,7 @@ class mainpanel(bpy.types.Panel):
                 obj['Movement'][0] = len(movementdict)
                 layout.label(text=movementdict[len(movementdict)][1])
             
-            
+            #path slider and label
             layout.prop(obj, '["Path Unlock Type"]')
             if(obj['Path Unlock Type'][0] > 0 and obj['Path Unlock Type'][0] < len(pathtypedict)+1):
                 layout.label(text=pathtypedict[obj['Path Unlock Type'][0]])
@@ -296,13 +293,14 @@ class mainpanel(bpy.types.Panel):
                 
                 
         if(obj.name[0:1]=='K'):
-                 
+            
+            #Route Label
             for x in routeTuples():
                 if((x[0]) == obj.name[0:4]):
                     layout.label(text='Route: R' + obj.name + x[1])
 
         
-
+            #sound slider and label
             layout.prop(obj, '["Sound"]')
             if(obj['Sound'][0] > 0 and obj['Sound'][0] < len(sounddict)+1):
                 layout.label(text=sounddict[obj['Sound'][0]][1])
@@ -315,7 +313,7 @@ class mainpanel(bpy.types.Panel):
                 obj['Sound'][0] = len(sounddict)
                 layout.label(text=sounddict[len(sounddict)][1])
                             
- 
+            #movement slider and label
             layout.prop(obj, '["Movement"]')
             if(obj['Movement'][0] > 0 and obj['Movement'][0] < len(movementdict)+1):
                 layout.label(text=movementdict[obj['Movement'][0]][1])
