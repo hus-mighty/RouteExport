@@ -75,12 +75,12 @@ def getRoute():
 
 
 #Route generation
-def generateRoute(routeentry, sounds, movement):
+def generateRoute(routeentry):
     route = []
     for x in fnodearr():
         for y in fnodearr():
             if ((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R' and len(routeentry) == 1)):
-                route.append([f'{routeentry[0]}',sounds,movement])
+                route.append([f'{routeentry[0]}','',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]])
             elif((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R') and len(routeentry) > 1):
                 l = 0
                 for a in range(0,len(routeentry)):
@@ -88,26 +88,26 @@ def generateRoute(routeentry, sounds, movement):
                 for c in range(0,l):
                     if(c==0 and len(routeentry)-1 < 2):
                         if( routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'F'):
-                            route.append((f'{routeentry[0]}',sounds,movement))
+                            route.append((f'{routeentry[0]}',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]))
                             break
                         elif(routeentry[0][5:6] == 'F' and  routeentry[1][0:1] == 'K'):
-                            route.append((f'R{routeentry[0][1:5] + routeentry[1]}',sounds,movement))
-                            route.append((f'R{routeentry[1] + routeentry[0][5:9]}',sounds,movement))
+                            route.append((f'R{routeentry[0][1:5] + routeentry[1]}',movementdict[bpy.data.objects[routeentry[0][1:5]]["Movement"]],sounddict[bpy.data.objects[routeentry[0][1:5]]["Sound"]]))
+                            route.append((f'R{routeentry[1] + routeentry[0][5:9]}',movementdict[bpy.data.objects[routeentry[1]]["Movement"]],sounddict[bpy.data.objects[routeentry[1]]["Sound"]]))
                             break
                         else:
-                            route.append((f'R{routeentry[0][1:5] + routeentry[1]}',sounds,movement))
-                            route.append((f'R{routeentry[1] + routeentry[0][5:9]}',sounds,movement))
+                            route.append((f'R{routeentry[0][1:5] + routeentry[1]}',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]))
+                            route.append((f'R{routeentry[1] + routeentry[0][5:9]}',movementdict[bpy.data.objects[routeentry[1]]["Movement"]],sounddict[bpy.data.objects[routeentry[1]]["Sound"]]))
                             break
                     elif(c==0 and len(routeentry)-1 > 1):
                         
-                        route.append((f'R{routeentry[0][1:5] + routeentry[c+1]}',sounds,movement))
+                        route.append((f'R{routeentry[0][1:5] + routeentry[c+1]}',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]))
                     elif(c==len(routeentry)-1):
                         if(routeentry[c][0:1] == 'F'):
                             break
                         else:
-                            route.append((f'R{routeentry[c] + routeentry[0][5:9]}',sounds,movement))
+                            route.append((f'R{routeentry[c] + routeentry[0][5:9]}',movementdict[bpy.data.objects[routeentry[c]]["Movement"]],sounddict[bpy.data.objects[routeentry[c]]["Sound"]]))
                     elif(c > 0 and c < len(routeentry)-1):
-                        route.append((f'R{routeentry[c] + routeentry[c+1]}',sounds,movement))
+                        route.append((f'R{routeentry[c] + routeentry[c+1]}',movementdict[bpy.data.objects[routeentry[c]]["Movement"]],sounddict[bpy.data.objects[routeentry[c]]["Sound"]]))
     return route
 
 
@@ -126,10 +126,9 @@ def writeRoute(dir, routearray):
 def routeGeneration():
     h = []
     for x in getRoute():
-        h += generateRoute(x,movementdict[bpy.data.objects[x[0]]["Movement"]][0], sounddict[bpy.data.objects[x[0]]["Sound"]][0])
-
+        h += generateRoute(x)
     return h
-
+#,h[x][1], sounddict[bpy.data.objects[x[0]]["Sound"]]
 
 def levelTuples():
     h = []
@@ -139,33 +138,33 @@ def levelTuples():
         
         
 sounddict = {
-    'Road' : ('"道"','Road'),
-    'Snow' : ('"雪"','Snow'),
-    'Sand' : ('"砂"','Sand'),
-    'Ice - Unused': ('"氷"','Ice - Unused'),
-    'Grass' : ('"草"','Grass'),
-    'Water' : ('"水"','Water'),
-    'Cloud' : ('"雲"','Cloud'),
-    'Sand Geyser - Unused' : ('"砂間欠泉"','Sand Geyser - Unused'),
-    'Mushroom' : ('"マンタ"','Mushroom'),
-    'Beach - Unused' : ('"ビーチ"','Beach - Unused'),
-    'Carpet' : ('"じゅうたん"','Carpet'),
-    'Leaf - Unused' : ('"葉っぱ"','Leaf - Unused'),
-    'Barrel' : ('"樽"','Barrel'),
-    'Water Geyser - Unused' : ('"水間欠泉"','Water Geyser - Unused'),
+    'Road' : '"道"',
+    'Snow' : '"雪"',
+    'Sand' : '"砂"',
+    'Ice - Unused': '"氷"',
+    'Grass' : '"草"',
+    'Water' : '"水"',
+    'Cloud' : '"雲"',
+    'Sand Geyser - Unused' : '"砂間欠泉"',
+    'Mushroom' : '"マンタ"',
+    'Beach - Unused' : '"ビーチ"',
+    'Carpet' : '"じゅうたん"',
+    'Leaf - Unused' : '"葉っぱ"',
+    'Barrel' : '"樽"',
+    'Water Geyser - Unused' : '"水間欠泉"',
     '' : ""
 }
 
 movementdict = {
-    'Walk' : ('走る','Walk'),
-    'Jump' : ('ジャンプ','Jump'),
+    'Walk' : '走る',
+    'Jump' : 'ジャンプ',
     '' : ""
 }
     
 pathtypedict = {
     1 : "Normal",
     2 : "Secret Exit",
-    3 : "Both",
+    3 : "Normal and Secret",
     "" : ""
 }
 
@@ -208,9 +207,9 @@ class properties(bpy.types.PropertyGroup):
     pathenum : bpy.props.EnumProperty(
     name = "Path Unlock",
     description = "",
-    items = [('1','Normal',""),
-             ('2','Secret Exit',""),
-             ('3','Both',"")]       
+    items = [('Normal','Normal',""),
+             ('Secret Exit','Secret Exit',""),
+             ('Normal and Secret','Normal and Secret',"")]       
 )
 
 
@@ -248,6 +247,19 @@ class mainpanel(bpy.types.Panel):
             #Route Label
             if(obj.children):
                 layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
+            else:
+                layout.label(text='Route: End')
+                
+            
+            layout.prop(mytool, "soundenum")
+            layout.prop(mytool, "movementenum")
+
+            
+            row = layout.row()
+            row.operator("routeexport.writeprop")
+            
+            layout.label(text='Sound: ' + bpy.data.objects[objname]["Sound"]) 
+            layout.label(text='Movement: ' + bpy.data.objects[objname]["Movement"])
 
 
         #route
@@ -267,7 +279,7 @@ class mainpanel(bpy.types.Panel):
             row.operator("routeexport.writeprop")
             
             layout.label(text='Sound: ' + bpy.data.objects[objname]["Sound"]) 
-            layout.label(text='Movement: ' + bpy.data.objects[objname]["Movement"])
+            layout.label(text='Movement: ' + bpy.data.objects[objname]["Movement"])   
             layout.label(text='Path Type: ' + bpy.data.objects[objname]["Path Unlock Type"])
 
 
@@ -275,15 +287,21 @@ class mainpanel(bpy.types.Panel):
             
             #Route Label
             if(obj.children):
-                layout.label(text='Route: ' + obj.name[0:5] + obj.children[0].name)
+                layout.label(text='Route: R' + obj.name[0:5] + obj.children[0].name)
             else:
                 layout.label(text='Route: R' + obj.name + getKNodeParent(obj).name[5:9])
 
+            layout.prop(mytool, "soundenum")
+            layout.prop(mytool, "movementenum")
+            
+            row = layout.row()
+            row.operator("routeexport.writeprop")
+            
+            layout.label(text='Sound: ' + bpy.data.objects[objname]["Sound"]) 
+            layout.label(text='Movement: ' + bpy.data.objects[objname]["Movement"])
 
-
-        
-        
-
+#button operators
+#set properties
 class writeprop(bpy.types.Operator):
     bl_label = "Set Properties "
     bl_idname = "routeexport.writeprop"
@@ -299,13 +317,11 @@ class writeprop(bpy.types.Operator):
         bpy.data.objects[name]["Movement"] = bpy.context.scene.my_tool.movementenum
         bpy.data.objects[name]["Sound"] = bpy.context.scene.my_tool.soundenum
         bpy.data.objects[name]["Path Unlock Type"] = bpy.context.scene.my_tool.pathenum
-        
+    
 
         return {"FINISHED"}
-
-        
-
     
+#write csv files
 class writefiles(bpy.types.Operator):
     bl_label = "Generate Route Files"
     bl_idname = "routeexport.writefiles"
@@ -329,13 +345,11 @@ class writefiles(bpy.types.Operator):
         else:
             self.report({"ERROR"},"Invalid path, set a valid directory and make sure it's an absolute path.")
             return {"FINISHED"}
-        
+
+#generate the custom properties for objects
 class propgen(bpy.types.Operator):
     bl_label = "Generate/Reset Properties"
     bl_idname = "routeexport.propgen"
-
-        
-
 
     def execute(self,context):
         layout = self.layout
@@ -343,31 +357,31 @@ class propgen(bpy.types.Operator):
         mytool = scene.my_tool
         obj = context.object
          
-        routes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["R"]]
+        routes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["R"] and obj.parent.name == "route"]
         for obj in routes:
             obj["Movement"] = "Walk"
             obj["Sound"] = "Road"
-            obj["Path Unlock Type"] = "1"
+            obj["Path Unlock Type"] = "Normal"
             
-        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["F"]]
+        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["F"] and 
+        (obj.parent.name == "route" or obj.parent.name[0:2] == "F0" or obj.parent.name[0:1] == "K" or obj.parent.name[0:1] == "R")]
 
         for obj in fnodes:
             obj["Event"] = 'stop'
-            obj["Movement"] = ""
-            obj["Sound"] = ""
+            obj["Movement"] = "Walk"
+            obj["Sound"] = "Road"
             
-        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["K"]]
+        fnodes = [obj for obj in bpy.data.objects if obj.name[0:1] in ["K"] and
+        (obj.parent.name[0:1] == "K" or obj.parent.name[0:1] == "R")]
 
         for obj in fnodes:
-            obj["Movement"] = ""
-            obj["Sound"] = ""
+            obj["Movement"] = "Walk"
+            obj["Sound"] = "Road"
         
         return {"FINISHED"}
 
 
-    
 classes = [properties,mainpanel,writeprop,writefiles,propgen]
-    
     
 def register():
     for cls in classes:
@@ -383,3 +397,4 @@ def unregister():
 
 if __name__ == "__main__":
     register()
+    
