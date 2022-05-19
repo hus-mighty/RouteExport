@@ -80,7 +80,7 @@ def generateRoute(routeentry):
     for x in fnodearr():
         for y in fnodearr():
             if ((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R' and len(routeentry) == 1)):
-                route.append([f'{routeentry[0]}','',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]])
+                route.append([f'{routeentry[0]}',movementdict[bpy.data.objects[routeentry[0]]["Movement"]],sounddict[bpy.data.objects[routeentry[0]]["Sound"]]])
             elif((routeentry[0] == 'R' + x + y) and (routeentry[0][0:1] == 'R') and len(routeentry) > 1):
                 l = 0
                 for a in range(0,len(routeentry)):
