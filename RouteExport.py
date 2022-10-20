@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "Map Export",
+    "name": "RouteExport",
     "blender": (3, 00, 0),
     "category": "Object",
 }
@@ -215,10 +215,10 @@ class properties(bpy.types.PropertyGroup):
 
 class mainpanel(bpy.types.Panel):
     bl_label = "RouteExport"
-    bl_idname = "ADDONNAME_PT_main_panel"
+    bl_idname = "ROUTEEXPORT_main_panel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RouteExp"
+    bl_category = "NSMB2"
     
     def draw(self, context):
         layout = self.layout
