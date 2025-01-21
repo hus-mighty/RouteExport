@@ -1,6 +1,7 @@
 # RouteExport
 ###### A Blender Add-on to simplify creating custom Worldmaps for NSMB2
 
+![](https://github.com/hus-mighty/RouteExport/blob/main/routeexport.gif)
 
 ### Usage
 * Install the Add-on in the Add-on Menu under the Preferences
