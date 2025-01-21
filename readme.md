@@ -11,10 +11,10 @@ As it does not generate level unlocks yet, there are still other minor changes t
 * Install the add-on from the Add-ons menu under Settings
   
 ### Usage
-* In the 3D viewport, press N to open the sidebar. The RouteExport menu is on the Element tab.
-* Press the "Generate Properties" button to generate generic properties.
-* Select the Sound, Movement ID and Path Unlock properties and click on "Set Properties" to do so.
-* Generate the Route Files once you're done.
+* In the 3D viewport, press N to open the sidebar. The RouteExport tab should be on the bottom
+* Press the "Generate Properties" button to generate generic properties
+* Select the Sound, Movement ID and Path Unlock properties and click on "Set Properties" to do so
+* Generate the Route Files when finished
 
 ### To-do
 * Complete generation of the point.csv file
