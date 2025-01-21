@@ -1,11 +1,21 @@
 # RouteExport
-###### A Blender Add-on to simplify creating custom Worldmaps for NSMB2
+###### A Blender Add-on to simplify the creation of custom world maps for NSMB2
+
+This add-on generates a route and point file based on your NSMB2 world map model.
+
+As it does not generate level unlocks yet, there are still other minor changes to be made to the output file to make it fully usable.
 
 ![](https://github.com/hus-mighty/RouteExport/blob/main/routeexport.gif)
 
+### Installation
+* Install the add-on from the Add-ons menu under Settings
+  
 ### Usage
-* Install the Add-on in the Add-on Menu under the Preferences
-* In the 3D Viewport, Press N to open the sidebar, the RouteExport menu is in the Item tab
+* In the 3D viewport, press N to open the sidebar. The RouteExport menu is on the Element tab.
+* Press the "Generate Properties" button to generate generic properties.
+* Select the Sound, Movement ID and Path Unlock properties and click on "Set Properties" to do so.
+* Generate the Route Files once you're done.
+
 ### To-do
-* Generating the point.csv file entirely
-* Implementing the UI and custom properties for nodes and routes
+* Complete generation of the point.csv file
+* Implementation of UI and custom properties for nodes and routes
