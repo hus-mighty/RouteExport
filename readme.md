@@ -5,6 +5,8 @@ This add-on generates a route and point file based on your NSMB2 world map model
 
 As it does not generate level unlocks yet, there are still other minor changes to be made to the output file to make it fully usable.
 
+For more documentation about world maps, see: https://gamebanana.com/tuts/13719
+
 ![](https://github.com/hus-mighty/RouteExport/blob/main/routeexport.gif)
 
 ### Installation
